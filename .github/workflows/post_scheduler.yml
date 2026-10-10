@@ -25,11 +25,11 @@ jobs:
       id: setup_uv
       uses: astral-sh/setup-uv@v10.3.0
       with:
-        version: 0.12.10
+        version: "0.12.10"
         enable-cache: true
 
     - name: Install publish-post dependencies
-      run: uv sync --package modules/publish-post
+      run: uv sync --package publish-post
 
     - name: Run publish-post
       env:
@@ -37,15 +37,15 @@ jobs:
         FB_APP_ACCESS_TOKEN: ${{ secrets.FB_APP_ACCESS_TOKEN }}
         FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
         FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-      run: uv run --package modules/publish-post python -m publish_post
+      run: uv run --package publish-post python -m publish_post
 
     - name: Install cron-cleanup dependencies
       if: ${{ always() && steps.checkout.outcome == 'success' }}
-      run: uv sync --package modules/cron-cleanup
+      run: uv sync --package cron-cleanup
 
     - name: Run cron-cleanup
       if: ${{ always() && steps.checkout.outcome == 'success' }}
-      run: uv run --package modules/cron-cleanup python -m cron_cleanup
+      run: uv run --package cron-cleanup python -m cron_cleanup
 
     - name: Commit and push changes
       if: ${{ always() && steps.checkout.outcome == 'success' }}
@@ -53,7 +53,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-        git add data/scheduled_posts.csv .github/workflows/post_scheduler.yml
+        git add data/schedule-posts.csv .github/workflows/post_scheduler.yml
 
         if ! git diff --cached --quiet; then
           git commit -m "chore: update published posts and cron cleanup"
