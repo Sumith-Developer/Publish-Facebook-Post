@@ -17,8 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPO_WORKFLOW_TOKEN }}
           ref: main
+          persist-credentials: true
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.0
