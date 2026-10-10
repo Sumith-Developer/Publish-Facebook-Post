@@ -26,7 +26,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --project setup-cron
+        run: uv sync --project modules/setup-cron
 
       - name: Run cron scheduler
         env:

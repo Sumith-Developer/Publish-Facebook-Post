@@ -27,7 +27,7 @@ jobs:
           enable-cache: true
 
       - name: Install publish-post dependencies
-        run: uv sync --package publish-post
+        run: uv sync --package modules/publish-post
 
       - name: Run publish-post
         env:
@@ -35,15 +35,15 @@ jobs:
           FB_APP_ACCESS_TOKEN: ${{ secrets.FB_APP_ACCESS_TOKEN }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-        run: uv run --package publish-post python -m publish_post
+        run: uv run --package modules/publish-post python -m publish_post
 
       - name: Install cron-cleanup dependencies
         if: ${{ always() && steps.checkout.outcome == 'success' }}
-        run: uv sync --package cron-cleanup
+        run: uv sync --package modules/cron-cleanup
 
       - name: Run cron-cleanup
         if: ${{ always() && steps.checkout.outcome == 'success' }}
-        run: uv run --package cron-cleanup python -m cron_cleanup
+        run: uv run --package modules/cron-cleanup python -m cron_cleanup
 
       - name: Commit and push changes
         if: ${{ always() && steps.checkout.outcome == 'success' }}
