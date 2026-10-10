@@ -5,7 +5,7 @@ on:
   - cron: 30 18 * * *
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
@@ -16,8 +16,10 @@ jobs:
       id: checkout
       uses: actions/checkout@v7
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.REPO_WORKFLOW_TOKEN }}
         ref: main
+        persist-credentials: true
+
 
     - name: Set up uv
       id: setup_uv
