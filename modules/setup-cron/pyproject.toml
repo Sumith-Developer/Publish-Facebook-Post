@@ -1,0 +1,23 @@
+[project]
+name = "setup-cron"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sumith-Kumar-Saini", email = "sumithsaini01@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "extract-csv",
+    "verify-token",
+    "workflow-schedule",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+extract-csv = { workspace = true, editable = true }
+verify-token = { workspace = true, editable = true }
+workflow-schedule = { workspace = true, editable = true }

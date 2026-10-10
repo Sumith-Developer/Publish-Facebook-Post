@@ -1,0 +1,24 @@
+[project]
+name = "publish-post"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sumith-Kumar-Saini", email = "sumithsaini01@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "extract-csv",
+    "pillow>=12.3.0",
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+    "verify-token",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+extract-csv = { workspace = true, editable = true }
+verify-token = { workspace = true, editable = true }

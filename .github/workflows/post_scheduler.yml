@@ -1,0 +1,61 @@
+name: Post Scheduler
+
+on:
+  repository_dispatch:
+    types:
+      - disabled-forever-never-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Set up uv
+        id: setup_uv
+        uses: astral-sh/setup-uv@v10.3.0
+        with:
+          enable-cache: true
+
+      - name: Install publish-post dependencies
+        run: uv sync --package publish-post
+
+      - name: Run publish-post
+        env:
+          FB_GRAPH_API_VERSION: ${{ secrets.FB_GRAPH_API_VERSION }}
+          FB_APP_ACCESS_TOKEN: ${{ secrets.FB_APP_ACCESS_TOKEN }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+        run: uv run --package publish-post python -m publish_post
+
+      - name: Install cron-cleanup dependencies
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        run: uv sync --package cron-cleanup
+
+      - name: Run cron-cleanup
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        run: uv run --package cron-cleanup python -m cron_cleanup
+
+      - name: Commit and push changes
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/scheduled_posts.csv .github/workflows/post_scheduler.yml
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update published posts and cron cleanup"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit."
+          fi

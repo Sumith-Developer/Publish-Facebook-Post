@@ -1,0 +1,49 @@
+name: Cron Generator
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  activate-cron:
+    if: contains(github.event.head_commit.message, '[activate cron]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.0
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --project setup-cron
+
+      - name: Run cron scheduler
+        env:
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_APP_ACCESS_TOKEN: ${{ secrets.FB_APP_ACCESS_TOKEN }}
+        run: uv run --package setup-cron python -m setup_cron
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .github/workflows/cron_generator.yml
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update cron schedule"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit."
+          fi
